@@ -3,10 +3,14 @@ import User from '../models/UserModel.js';
 import bcrypt from 'bcryptjs';
 
 // validation
-import { registerValidation } from '../validation/userValidation.js';
+import {
+  registerValidation,
+  loginValidation,
+} from '../validation/userValidation.js';
 
 const router = express.Router();
 
+//register
 router.post('/register', async (req, res) => {
   //VALIDATE THE DATA BEFORE USER
   const { error } = registerValidation(req.body);
@@ -37,6 +41,26 @@ router.post('/register', async (req, res) => {
       message: err?.message ?? 'Something went wrong, please try again',
     });
   }
+});
+
+//Login
+router.post('/login', async (req, res) => {
+  //VALIDATE THE DATA BEFORE USER
+  const { error } = loginValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  //Checking if email exist
+  const userEmail = await User.findOne({ email: req.body.email });
+  if (!userEmail) return res.status(400).send('Email or password is wrong');
+
+  //Check if password is correct
+  const validPassword = await bcrypt.compare(
+    req.body.password,
+    userEmail.password
+  );
+  if (!validPassword) return res.status(400).send('Email or password is wrong');
+
+  res.send('successful login');
 });
 
 export default router;

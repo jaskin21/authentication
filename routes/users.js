@@ -1,6 +1,8 @@
 import express from 'express';
 import User from '../models/UserModel.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
 // validation
 import {
@@ -59,6 +61,10 @@ router.post('/login', async (req, res) => {
     userEmail.password
   );
   if (!validPassword) return res.status(400).send('Email or password is wrong');
+
+  // Create and assign a token
+  const token = jwt.sign({ _id: userEmail._id }, process.env.TOKEN_SECRET);
+  res.header('auth-token', token).send(token);
 
   res.send('successful login');
 });

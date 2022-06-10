@@ -8,7 +8,8 @@ import cors from 'cors';
 import logger from 'morgan';
 import connectDb from './connect-db.js';
 
-import usersRouter from './routes/users.js';
+import userRouter from './routes/users.js';
+import postRoute from './routes/posts.js';
 
 const app = express();
 
@@ -22,7 +23,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/user', usersRouter);
+app.use('/api/user', userRouter);
+app.use('/api/post', postRoute);
 
 app.use(function (req, res, next) {
   res
